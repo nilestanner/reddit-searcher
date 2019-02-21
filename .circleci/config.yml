@@ -1,0 +1,41 @@
+version: 2
+jobs:
+  getRedditsMorning:
+    docker:
+      - image: circleci/node:7.10
+
+    working_directory: ~/repo
+
+    steps:
+      - run: curl https://reddit-search.herokuapp.com/search
+  getRedditsAfternoon:
+    docker:
+      - image: circleci/node:7.10
+
+    working_directory: ~/repo
+
+    steps:
+      - run: curl https://reddit-search.herokuapp.com/search
+
+workflows:
+  version: 2
+  morningly:
+    triggers:
+      - schedule:
+          cron: "30 14 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - getRedditsMorning
+  afternoonly:
+    triggers:
+      - schedule:
+          cron: "30 22 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - getRedditsAfternoon
