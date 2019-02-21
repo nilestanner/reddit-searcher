@@ -43,6 +43,10 @@ app.get('/search', (req, res) => {
     res.send('Job started');
 });
 
+app.get('/', (req, res) => {
+    res.send('Hello, you have found me');
+});
+
 const sendTextUpdate = (message) => {
     textService.sendText({
         number: process.env.PHONE,
