@@ -65,10 +65,7 @@ const checkPosts = async (posts) => {
     for (post of posts) {
         post = post.data;
         const notFound = await findPost(post);
-        console.log(notFound);
-        console.log(post.created_utc);
         if (notFound) {
-            console.log(post.created_utc);
             const message = `${post.url}`;
             sendTextUpdate(message);
             await saveToDb(post);
