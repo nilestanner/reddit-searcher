@@ -34,17 +34,11 @@ MongoClient.connect(process.env.MONGODB_URI, async (err, client) => {
     app.listen(PORT, () => console.log(`Reddit Scanner listening on port ${PORT}!`));
 });
 
-
-
 app.get('/search', (req, res) => {
     request.get(process.env.SEARCHURL, (err, res, body) => {
         const json = JSON.parse(body);
         if (json.data.dist > 0) {
-            json.data.children.forEach((child, i) => {
-                const message = `${child.data.url}`;
-                sendTextUpdate(message);
-                saveToDb(child)
-            });
+            checkPosts(json.data.children);
         }
     });
     res.send('Job started');
@@ -54,9 +48,9 @@ app.get('/', (req, res) => {
     res.send('Hello, you have found me');
 });
 
-const saveToDb = (post) => {
+const saveToDb = async (post) => {
     const search = {created_utc: post.created_utc};
-    global.redditDB.collection('cvpposts').updateOne(search, {$set: post}, {'upsert':true})
+    await global.redditDB.collection('cvpposts').updateOne(search, {$set: post}, {'upsert':true})
 }
 
 const sendTextUpdate = (message) => {
@@ -64,6 +58,29 @@ const sendTextUpdate = (message) => {
         number: process.env.PHONE,
         message: message,
         carrier: process.env.PHONECARRIER
+    });
+}
+
+const checkPosts = async (posts) => {
+    for (post of posts) {
+        post = post.data;
+        const notFound = await findPost(post);
+        console.log(notFound);
+        console.log(post.created_utc);
+        if (notFound) {
+            console.log(post.created_utc);
+            const message = `${post.url}`;
+            sendTextUpdate(message);
+            await saveToDb(post);
+        }
+    }
+}
+
+const findPost = async (post) => {
+    return new Promise((resolve, reject) => {
+        global.redditDB.collection('cvpposts').findOne({created_utc: post.created_utc}, (err, result) => {
+            resolve(!result)
+        });
     });
 }
 
