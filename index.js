@@ -63,12 +63,12 @@ const checkPosts = async (posts, collection) => {
     for (post of posts) {
         post = post.data;
         const notFound = await findPost(post, collection);
-        // if (notFound) {
+        if (notFound) {
             console.log(`found new post: ${post.title}`);
             const message = `${post.url}`;
             sendTextUpdate(message);
-            // await saveToDb(post, collection);
-        // }
+            await saveToDb(post, collection);
+        }
     }
 }
 
