@@ -29,7 +29,7 @@ const textService = freeTextAPI({
     }
 });
 
-MongoClient.connect(process.env.MONGODB_URI, async (err, client) => {
+MongoClient.connect(process.env.MONGODB_URI,  { useNewUrlParser: true }, async (err, client) => {
     global.redditDB = client.db(process.env.MONGODBNAME);
     app.listen(PORT, () => console.log(`Reddit Scanner listening on port ${PORT}!`));
 });
@@ -54,6 +54,8 @@ const sendTextUpdate = (message) => {
         number: process.env.PHONE,
         message: message,
         carrier: process.env.PHONECARRIER
+    }).catch((err) => {
+        console.log(err);
     });
 }
 
@@ -61,11 +63,12 @@ const checkPosts = async (posts, collection) => {
     for (post of posts) {
         post = post.data;
         const notFound = await findPost(post, collection);
-        if (notFound) {
+        // if (notFound) {
+            console.log(`found new post: ${post.title}`);
             const message = `${post.url}`;
             sendTextUpdate(message);
-            await saveToDb(post, collection);
-        }
+            // await saveToDb(post, collection);
+        // }
     }
 }
 
@@ -78,6 +81,7 @@ const findPost = async (post, collection) => {
 }
 
 const searchWithKeyword = async (searchString, collection) => {
+    console.log(`Seaching for ${searchString}`);
     return new Promise((resolve, reject) => {
         request.get(`${process.env.SEARCHURL}&q=${searchString}`, async (err, res, body) => {
             const json = JSON.parse(body);
