@@ -23,8 +23,7 @@ const textService = freeTextAPI({
     transport: {
         service: process.env.TRANSPORTMETHOD,
         auth: {
-            user: process.env.TRANSPORTUSER,
-            pass: process.env.TRANSPORTPASS
+            api_key: process.env.TRANSPORTAPIKEY
         }
     }
 });
@@ -49,13 +48,14 @@ const saveToDb = async (post, collection) => {
     await global.redditDB.collection(collection).updateOne(search, {$set: post}, {'upsert':true})
 }
 
-const sendTextUpdate = (message) => {
+const sendTextUpdate = (title, message) => {
     textService.sendText({
+        subject: title,
         number: process.env.PHONE,
         message: message,
         carrier: process.env.PHONECARRIER
-    }).catch((err) => {
-        console.log(err);
+    }).then((result) => {
+        console.log(result);
     });
 }
 
@@ -66,7 +66,7 @@ const checkPosts = async (posts, collection) => {
         if (notFound) {
             console.log(`found new post: ${post.title}`);
             const message = `${post.url}`;
-            sendTextUpdate(message);
+            sendTextUpdate(post.title, message);
             await saveToDb(post, collection);
         }
     }
