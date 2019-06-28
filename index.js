@@ -35,8 +35,11 @@ MongoClient.connect(process.env.MONGODB_URI,  { useNewUrlParser: true }, async (
 
 app.get('/search', async (req, res) => {
     res.send('Job started');
-    await searchWithKeyword('cvp', 'cvpposts');
-    await searchWithKeyword('price changes', 'pcposts');
+    const terms = process.env.SEARCHTERMS.split(',');
+    console.log(terms);
+    for (let term of terms) {
+        await searchWithKeyword(term, term);
+    }
 });
 
 app.get('/', (req, res) => {
