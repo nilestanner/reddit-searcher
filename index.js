@@ -12,11 +12,6 @@ app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}))
 
 const textService = freeTextAPI({
-    carrierLookup: {
-        method: process.env.LOOKUPMETHOD,
-        apiKey: process.env.LOOKUPKEY,
-        defaultCountry: process.env.LOOKUPCOUNTRY
-    },
     mailOptions: {
         from: process.env.FROM
     },
@@ -36,7 +31,6 @@ MongoClient.connect(process.env.MONGODB_URI,  { useNewUrlParser: true }, async (
 app.get('/search', async (req, res) => {
     res.send('Job started');
     const terms = process.env.SEARCHTERMS.split(',');
-    console.log(terms);
     for (let term of terms) {
         await searchWithKeyword(term, term);
     }
