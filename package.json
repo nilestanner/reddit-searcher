@@ -16,7 +16,7 @@
     "dotenv": "^6.2.0",
     "express": "^4.17.1",
     "free-text-api": "^1.4.0",
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.19",
     "mongodb": "^3.2.7",
     "nodemon": "^1.19.1",
     "request": "^2.88.0"
